@@ -1,4 +1,4 @@
-package observer
+package simple
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestObserver(t *testing.T) {
-	event :=  NewEvent()
+	event := NewEvent()
 
 	investerlee := NewInvestorObserver("lee")
 	investeranne := NewInvestorObserver("anne")
