@@ -1,11 +1,15 @@
 package proxy
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestProxyObject(t *testing.T) {
-	object := &Object{action: "run"}
 
-	proxyObject :=  new(ProxyObject)
-	proxyObject.object = object
-	proxyObject.ObjDo("run")
+	proxy := NewThirdPartyYouTubeLibProxy()
+	video := proxy.GetVideo(1)
+	fmt.Println("video=", video)
+	video = proxy.GetVideo(1)
+	fmt.Println("video=", video)
 }

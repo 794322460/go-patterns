@@ -5,12 +5,38 @@ import (
 	"testing"
 )
 
-func TestCreateAppleDecorator(t *testing.T) {
-	var comp Component = &Fruit{Count: 8, Description: "水果统称"}
-	result := CreateAppleDecorator(comp, "apple", 20)
-	fmt.Println(result.Describe())
-	re := result.GetCount()
-	if re != 28 {
-		t.Errorf("装饰错误，期待结果为%d", re)
-	}
+func TestDecorator(t *testing.T) {
+
+	// 普通文件读写
+	fileDataSource := NewFileDataSource("hello.txt")
+	// 增强，添加加密功能
+	encryptionDataSource := NewEncryptionDataSource(fileDataSource)
+	encryptionDataSource.WriteData("hello world")
+	data := encryptionDataSource.ReadData()
+	fmt.Println(data)
+
+}
+
+func TestDecorator2(t *testing.T) {
+
+	// 普通文件读写
+	fileDataSource := NewFileDataSource("hello.txt")
+	// 增强，添加压缩功能
+	compressDataSource := NewCompressDataSource(fileDataSource)
+	compressDataSource.WriteData("hello world")
+	data := compressDataSource.ReadData()
+	fmt.Println(data)
+
+}
+
+func TestDecorator3(t *testing.T) {
+
+	// 数据库读写
+	sqlDataSource := NewSqlDataSource("mysql;localhost:3306;table=hello")
+	// 增强，添加压缩功能
+	compressDataSource := NewCompressDataSource(sqlDataSource)
+	compressDataSource.WriteData("hello world")
+	data := compressDataSource.ReadData()
+	fmt.Println(data)
+
 }

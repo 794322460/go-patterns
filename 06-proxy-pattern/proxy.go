@@ -3,36 +3,54 @@ package proxy
 import "fmt"
 
 /*
-	proxy pattern provide object control access to another object, intercepting all calls
-	//设计思想
-		1. 代理inteface
-		2. 真实对象Object struct
-		3. 代理对象ProxyObject struct，属性为Object, 拦截所有的action
-		4. 方法ObjDo处理所有的逻辑
+proxy pattern provide object control access to another object, intercepting all calls
+
+在本例中， 代理模式有助于实现延迟初始化， 并对低效的第三方 YouTube 集成程序库进行缓存。
 */
 
-//1.use proxy and object they must implement same methods
-type IObject interface {
-	ObjDo(action string)
+type ThirdPartyYouTubeLib interface {
+	GetVideo(videoId int) Video
 }
-//2.object represents real objects which proxy will delegate data
-type Object struct {
-	action string
+
+type Video struct {
+	Id    int
+	Title string
+	Url   string
 }
-//3.ObjDo implement IObject interface and handle all logic
-func (obj *Object) ObjDo(action string) {
-	fmt.Printf("I can %s", action)
+
+func NewVideo(id int, title string) Video {
+	return Video{Id: id, Title: title, Url: "http://random.mp4"}
 }
-//ProxyObject represent proxy object with intercepts actions
-type ProxyObject struct {
-	object *Object
+
+type ThirdPartyYouTubeLibImpl struct{}
+
+func NewThirdPartyYouTubeLib() ThirdPartyYouTubeLib {
+	return &ThirdPartyYouTubeLibImpl{}
 }
-//拦截作用
-func (p *ProxyObject) ObjDo(action string) {
-	if p.object == nil {
-		p.object = new(Object)
+
+func (lib *ThirdPartyYouTubeLibImpl) GetVideo(videoId int) Video {
+	return NewVideo(videoId, "random Title")
+}
+
+// =========================================================================== //
+
+type ThirdPartyYouTubeLibProxy struct {
+	ThirdPartyYouTubeLib
+	cacheVideos map[int]Video
+}
+
+func NewThirdPartyYouTubeLibProxy() ThirdPartyYouTubeLib {
+	return &ThirdPartyYouTubeLibProxy{ThirdPartyYouTubeLib: NewThirdPartyYouTubeLib(), cacheVideos: make(map[int]Video, 100)}
+}
+
+func (p *ThirdPartyYouTubeLibProxy) GetVideo(videoId int) Video {
+	fmt.Println("代理：先尝试从缓存获取... videoId=", videoId)
+	if video, exists := p.cacheVideos[videoId]; exists {
+		fmt.Println("代理：命中缓存，直接返回... video=", video)
+		return video
 	}
-	if action == "run" {
-		p.object.ObjDo(action)
-	}
+	video := p.ThirdPartyYouTubeLib.GetVideo(videoId)
+	fmt.Println("代理：没有拿到数据，rpc调用获取，并放入缓存... video=", video)
+	p.cacheVideos[videoId] = video
+	return video
 }
