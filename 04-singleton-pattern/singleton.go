@@ -1,6 +1,9 @@
 package singleton
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 /*
 	单类模式严格一个类只有一个实例，并提供一个全局的访问接口
@@ -8,15 +11,22 @@ import "sync"
 		1.声明一个全局变量
 		2.多线程考虑线程安全，引入sync.Once
 */
-type singleton map[string]string
+var once sync.Once
+var helper *DocumentHelper
 
-var (
-	 once 		sync.Once
-	 instance 	singleton
-)
-func New() singleton {
+type DocumentHelper struct {
+	// ...一些线程安全の成员
+}
+
+func GetDocumentHelper() *DocumentHelper {
+	if helper != nil {
+		fmt.Println("已经存在，直接获取...")
+		return helper
+	}
+
 	once.Do(func() {
-		instance = make(singleton)
+		fmt.Println("第一次初始化...")
+		helper = &DocumentHelper{}
 	})
-	return instance
+	return helper
 }

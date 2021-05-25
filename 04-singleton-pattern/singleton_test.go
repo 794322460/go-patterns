@@ -1,18 +1,12 @@
 package singleton
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestNew(t *testing.T) {
-	s := New()
-	s["name"] = "lee"
-	//验证唯一性
-	s1 := New()
-	if s1["name"] != "lee" {
-		t.Error("singleton pattern error")
-	}
-	//change name
-	s1["name"] = "anne"
-	if s["name"] != "anne" {
-		t.Error("singleton pattern error")
-	}
+	s := GetDocumentHelper()
+	s1 := GetDocumentHelper()
+	fmt.Println(s == s1)
 }
